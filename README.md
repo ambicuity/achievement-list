@@ -4,14 +4,14 @@
 
 
 Badge	Name	How to get	Needed amount
-Heart On Your Sleeve	Heart On Your Sleeve	(???)	
+Heart On Your Sleeve	Heart On Your Sleeve	Submit a pull request that gets merged	
 DEFAULT	BRONZE	SILVER	GOLD
 			
-(?)	(?)	(?)	(?)
-Open Sourcerer	Open Sourcerer	(???)	
+1	2	4	8
+Open Sourcerer	Open Sourcerer	User had PRs merged in multiple public repositories	
 DEFAULT	BRONZE	SILVER	GOLD
 			
-(?)	(?)	(?)	(?)
+1	2	3	4
 Starstruck	Starstruck	Created a repository that has many stars	
 DEFAULT	BRONZE	SILVER	GOLD
 			
@@ -40,4 +40,6 @@ DEFAULT
 1
 Public Sponsor	Public Sponsor	Sponsored an open source contributor through GitHub Sponsors	
 DEFAULT
+
+1
 
