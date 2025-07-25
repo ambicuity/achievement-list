@@ -5,6 +5,11 @@ on:
   schedule:
     - cron: '0 12 * * 1'  # Weekly on Mondays at noon UTC
 
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
 jobs:
   track-badges:
     runs-on: ubuntu-latest
