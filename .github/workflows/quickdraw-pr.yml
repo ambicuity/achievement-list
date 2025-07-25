@@ -1,0 +1,111 @@
+name: Auto PR for Quickdraw Badge
+
+on:
+  workflow_dispatch:
+    inputs:
+      delay_seconds:
+        description: 'Seconds to wait before closing PR (minimum 30)'
+        required: false
+        default: '60'
+        type: string
+
+jobs:
+  quickdraw-pr:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+    - name: Create quickdraw branch
+      run: |
+        TIMESTAMP=$(date +%s)
+        BRANCH_NAME="quickdraw/auto-pr-$TIMESTAMP"
+        echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+        git checkout -b $BRANCH_NAME
+        
+    - name: Make a small change
+      run: |
+        # Add a comment to README or create a temp file
+        echo "<!-- Quickdraw PR created at $(date) -->" >> README.md
+        git add README.md
+        git commit -m "docs: add timestamp comment for quickdraw test
+
+        This is an automated commit for testing the Quickdraw badge.
+        Will be reverted after PR is closed.
+        "
+        
+    - name: Push branch
+      run: |
+        git push origin $BRANCH_NAME
+        
+    - name: Create PR
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        PR_URL=$(gh pr create \
+          --title "🚀 Quickdraw Test PR - Auto Close" \
+          --body "## Quickdraw Badge Test PR
+
+        This PR is created automatically to test the Quickdraw badge achievement.
+
+        **What this PR does:**
+        - Adds a timestamp comment to README.md
+        - Will be automatically closed after ${{ github.event.inputs.delay_seconds || '60' }} seconds
+        - Change will be reverted when closed
+
+        **Quickdraw Badge Requirements:**
+        - Close a PR within 5 minutes of creation ✅
+        - This PR will be closed in ${{ github.event.inputs.delay_seconds || '60' }} seconds
+
+        🏆 **Achievement Goal:** Quickdraw Badge
+        " \
+          --head $BRANCH_NAME \
+          --base main)
+        
+        echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+        echo "Created PR: $PR_URL"
+        
+    - name: Wait before closing
+      run: |
+        DELAY_SECONDS="${{ github.event.inputs.delay_seconds }}"
+        if [ -z "$DELAY_SECONDS" ] || [ "$DELAY_SECONDS" -lt 30 ]; then
+          DELAY_SECONDS=60
+        fi
+        echo "Waiting $DELAY_SECONDS seconds before closing PR..."
+        sleep $DELAY_SECONDS
+        
+    - name: Close PR and revert changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Close the PR with a comment
+        gh pr close $PR_URL --comment "🏆 Quickdraw badge test complete! 
+
+        This PR was automatically closed after ${{ github.event.inputs.delay_seconds || '60' }} seconds to earn the Quickdraw achievement badge.
+
+        **Badge Progress:** ✅ Quickdraw (closed within 5 minutes)
+        
+        The changes in this PR were reverted."
+        
+        # Revert the changes
+        git checkout main
+        git pull origin main
+        
+        # Remove the comment we added
+        sed -i '$d' README.md
+        
+        # Commit the revert if there are changes
+        if ! git diff --quiet; then
+          git add README.md
+          git commit -m "revert: remove quickdraw test comment"
+          git push origin main
+        fi
+        
+        # Delete the branch
+        git push origin --delete $BRANCH_NAME

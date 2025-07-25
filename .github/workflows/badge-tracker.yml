@@ -1,0 +1,62 @@
+name: Badge Progress Tracker
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 12 * * 1'  # Weekly on Mondays at noon UTC
+
+jobs:
+  track-badges:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Track badge progress
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python scripts/badge_tracker.py check --output badge_progress.json --format json
+        
+    - name: Generate summary
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python scripts/badge_tracker.py summary > badge_summary.txt
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: badge-progress-${{ github.run_number }}
+        path: |
+          badge_progress.json
+          badge_summary.txt
+          
+    - name: Create issue with progress (optional)
+      if: github.event_name == 'workflow_dispatch'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Create an issue with badge progress
+        SUMMARY=$(cat badge_summary.txt)
+        gh issue create \
+          --title "Badge Progress Report - $(date +'%Y-%m-%d')" \
+          --body "## Automated Badge Progress Report
+
+        $SUMMARY
+
+        Generated automatically by GitHub Actions.
+        
+        View detailed report in the artifacts of [this workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+        " \
+          --label "badge-tracking"
