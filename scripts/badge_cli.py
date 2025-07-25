@@ -121,6 +121,11 @@ def tips():
     """Show quick tips for earning badges"""
     click.echo(f"{Fore.GREEN}🏆 Quick Badge Earning Tips")
     click.echo()
+    click.echo(f"{Fore.CYAN}🎯 NEW: Comprehensive Badge Earning:")
+    click.echo(f"  badge earn plan             # See personalized earning plan")
+    click.echo(f"  badge earn execute          # Automatically earn all possible badges")
+    click.echo(f"  badge earn all --execute    # Full automation with verification")
+    click.echo()
     click.echo(f"{Fore.CYAN}🚀 Start Here (5-30 minutes):")
     click.echo(f"  1. badge quickdraw          # Easiest badge (5 min)")
     click.echo(f"  2. Create simple repo and merge PR without review (YOLO)")
@@ -138,6 +143,7 @@ def tips():
     click.echo()
     click.echo(f"{Fore.GREEN}Commands:")
     click.echo(f"  badge status               # Check your progress")
+    click.echo(f"  badge earn all --execute   # Earn all possible badges automatically")
     click.echo(f"  badge guide all           # See all guides")
     click.echo(f"  badge --help              # Full command list")
 
@@ -207,6 +213,50 @@ def dashboard():
     
     webbrowser.open(url)
     click.echo(f"{Fore.GREEN}✅ Opened: {url}")
+
+@cli.group()
+def earn():
+    """Comprehensive badge earning commands"""
+    pass
+
+@earn.command()
+@click.option('--execute', is_flag=True, help='Execute automated badge earning')
+@click.option('--verify', is_flag=True, help='Verify progress after execution')
+def all(execute, verify):
+    """Create and execute comprehensive badge earning plan"""
+    token = os.environ.get('GITHUB_TOKEN')
+    if not token:
+        click.echo(f"{Fore.RED}❌ GitHub token required. Run 'badge setup' first.")
+        return
+        
+    cmd = f"python {os.path.dirname(__file__)}/badge_orchestrator.py earn-all"
+    if execute:
+        cmd += " --execute"
+    if verify:
+        cmd += " --verify"
+    os.system(cmd)
+
+@earn.command()
+def plan():
+    """Show badge earning plan without execution"""
+    token = os.environ.get('GITHUB_TOKEN')
+    if not token:
+        click.echo(f"{Fore.RED}❌ GitHub token required. Run 'badge setup' first.")
+        return
+        
+    cmd = f"python {os.path.dirname(__file__)}/badge_orchestrator.py plan"
+    os.system(cmd)
+
+@earn.command()
+def execute():
+    """Execute automated badge earning with verification"""
+    token = os.environ.get('GITHUB_TOKEN')
+    if not token:
+        click.echo(f"{Fore.RED}❌ GitHub token required. Run 'badge setup' first.")
+        return
+        
+    cmd = f"python {os.path.dirname(__file__)}/badge_orchestrator.py execute"
+    os.system(cmd)
 
 if __name__ == "__main__":
     cli()

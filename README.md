@@ -5,7 +5,7 @@ Comprehensive tools and workflows to help you earn GitHub achievement badges as 
 ## 🚀 Quick Start
 
 ```bash
-# 1. Set up your GitHub token
+# 1. Set up your GitHub token (KEEP THIS SECURE!)
 export GITHUB_TOKEN="your_github_token_here"
 
 # 2. Install dependencies
@@ -16,7 +16,12 @@ python scripts/badge_cli.py status
 
 # 4. Get personalized tips
 python scripts/badge_cli.py tips
+
+# 5. NEW: Earn all possible badges automatically
+python scripts/badge_cli.py earn all --execute
 ```
+
+⚠️ **SECURITY WARNING**: Never commit your GitHub token to any repository! Keep your `GITHUB_TOKEN` environment variable secure and private.
 
 ## 🎯 Target Badges
 
@@ -33,6 +38,13 @@ python scripts/badge_cli.py tips
 | Galaxy Brain | ⭐⭐⭐⭐ | 1-6 months | Answer discussions |
 
 ## 🛠️ Tools & Scripts
+
+### 🎯 NEW: Comprehensive Badge Earning
+```bash
+python scripts/badge_cli.py earn plan         # Get personalized earning plan
+python scripts/badge_cli.py earn execute      # Automatically earn badges  
+python scripts/badge_cli.py earn all --execute # Full automation with verification
+```
 
 ### Main CLI Tool
 ```bash
@@ -101,9 +113,15 @@ Detailed guides for each badge are available in the [`guides/`](guides/) directo
 
 ## ⚡ Fastest Path to Badges
 
+### 🎯 NEW: One-Command Solution
+```bash
+# Earn all possible badges automatically
+python scripts/badge_cli.py earn all --execute
+```
+
 ### 5-Minute Achievements
 1. **Quickdraw** - `python scripts/badge_cli.py quickdraw`
-2. **YOLO** - Create and merge PR in your own repo without review
+2. **YOLO** - Create and merge PR in your own repo without review  
 3. **Public Sponsor** - Sponsor any developer $1/month via GitHub Sponsors
 
 ### Week 1-2 Goals  
